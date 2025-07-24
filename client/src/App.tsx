@@ -108,26 +108,31 @@ function App() {
   return (
     <>
       {userName ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
+        <>
+          <div className='title'>
+            <h1>Bingo Game</h1>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
 
-            gap: '10px',
-            width: 'fit-content',
-            margin: 'auto',
-            backgroundColor: 'rgba(24, 23, 22, 0.2)',
-            boxShadow: ' 0 1rem 2rem rgba(0, 0, 0, 0.61)',
-            mixBlendMode: 'overlay',
-            border: '1px solid white',
-            padding: 'clamp(1rem, 1rem + 1vw, 2.5rem)',
-            borderRadius: '2rem',
-          }}
-        >
-          {randomArr?.map((num, index) => (
-            <Card key={index} number={num} drawnNums={drawnNums} />
-          ))}
-        </div>
+              gap: '10px',
+              width: 'fit-content',
+              margin: 'auto',
+              backgroundColor: 'rgba(24, 23, 22, 0.2)',
+              boxShadow: ' 0 1rem 2rem rgba(0, 0, 0, 0.61)',
+              mixBlendMode: 'overlay',
+              border: '1px solid white',
+              padding: 'clamp(1rem, 1rem + 1vw, 2.5rem)',
+              borderRadius: '2rem',
+            }}
+          >
+            {randomArr?.map((num, index) => (
+              <Card key={index} number={num} drawnNums={drawnNums} />
+            ))}
+          </div>
+        </>
       ) : (
         <form
           onSubmit={e => {
