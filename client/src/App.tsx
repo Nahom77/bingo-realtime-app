@@ -4,9 +4,7 @@ import Card from './Card';
 
 function App() {
   // const [message, setMessage] = useState('');
-  const [numberReceived, setNumberReceived] = useState('');
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
-  const [countSimilarNums, setCountSimilarNums] = useState(0);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
@@ -26,7 +24,6 @@ function App() {
   useEffect(() => {
     socket.on('receive_message', data => {
       console.log(data);
-      setNumberReceived(data.num);
       setDrawnNums(data.allDrawnNumbers);
     });
 
@@ -41,7 +38,6 @@ function App() {
     if (drawnNums)
       for (const num of drawnNums) {
         if (randomArr.includes(Number(num)) && !matchedNums.includes(num)) {
-          setCountSimilarNums(prev => prev + 1);
           setMatchedNums(prev => [...prev, num]);
         }
       }
@@ -56,8 +52,6 @@ function App() {
   // setRandomArr(Array.from(UniqueNums));
 
   // console.log(randomArr);
-
-  console.log(countSimilarNums);
 
   return (
     <div
