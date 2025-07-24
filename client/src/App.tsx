@@ -9,6 +9,7 @@ function App() {
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
   const [userName, setUserName] = useState('');
+  const [winnerUser, setWinnerUser] = useState('');
 
   const nameRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +47,13 @@ function App() {
     };
   }, [userName]);
 
+  // Getting A winner Name
+  useEffect(() => {
+    socket.on('game_ended', data => {
+      setWinnerUser(data.message);
+    });
+  });
+
   // Winning condition
   useEffect(() => {
     if (drawnNums)
@@ -57,13 +65,15 @@ function App() {
   }, [drawnNums, randomArr, matchedNums]);
 
   if (matchedNums.length >= 5) {
-    socket.emit('send_message', { message: `${userName} Wins the game` });
+    socket.emit('send_message', { message: userName });
     socket.off('receive_message');
   }
 
   if (userName) {
     socket.emit('user_enterd', { userName });
   }
+
+  if (winnerUser) return <h1>You lose , {winnerUser} wins the game.</h1>;
 
   if (matchedNums.length >= 5) return <h1>You win</h1>;
 

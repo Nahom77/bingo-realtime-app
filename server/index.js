@@ -45,6 +45,7 @@ io.on('connection', socket => {
   socket.on('send_message', data => {
     console.log(data);
     clearInterval(emmitNumbers);
+    socket.broadcast.emit('game_ended', data);
   });
 });
 
