@@ -38,7 +38,10 @@ const randomArr = Array.from(UniqueNums);
 let index = 0;
 
 setInterval(() => {
-  io.emit('receive_message', randomArr[index]);
+  io.emit('receive_message', {
+    num: randomArr[index],
+    allDrawnNumbers: randomArr.slice(0, index + 1),
+  });
   index++;
 }, 5000);
 

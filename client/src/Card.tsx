@@ -1,10 +1,10 @@
 interface Props {
   number: number;
-  numberReceived: number;
+  drawnNums: number[] | null;
 }
 
-const Card = ({ number, numberReceived }: Props) => {
-  const isDrawn = number === numberReceived;
+const Card = ({ number, drawnNums }: Props) => {
+  const isDrawn = drawnNums?.includes(number);
 
   return (
     <div

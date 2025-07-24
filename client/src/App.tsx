@@ -5,16 +5,18 @@ import Card from './Card';
 function App() {
   // const [message, setMessage] = useState('');
   const [numberReceived, setNumberReceived] = useState('');
+  const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
   // const onSendMessage = () => {
   //   socket.emit('send_message', { message });
   // };
-
+  console.log(numberReceived);
   useEffect(() => {
     socket.on('receive_message', data => {
       console.log(data);
-      setNumberReceived(data);
+      setNumberReceived(data.num);
+      setDrawnNums(data.allDrawnNumbers);
     });
 
     // Cleanup on unmount
@@ -41,7 +43,7 @@ function App() {
     return Array.from(uniqueNums);
   }, []); // empty deps => only once
 
-  console.log(randomArr);
+  // console.log(randomArr);
   // let index = 0;
 
   return (
@@ -54,8 +56,8 @@ function App() {
         margin: 'auto',
       }}
     >
-      {randomArr?.map(num => (
-        <Card number={num} numberReceived={Number(numberReceived)} />
+      {randomArr?.map((num, index) => (
+        <Card key={index} number={num} drawnNums={drawnNums} />
       ))}
     </div>
   );
