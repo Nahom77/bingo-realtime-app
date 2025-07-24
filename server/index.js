@@ -18,14 +18,6 @@ const io = new Server(server, {
   },
 });
 
-// Connecting frontend and backend
-io.on('connection', socket => {
-  console.log(`User connected: ${socket.id}`);
-
-  // Listening on the event from frontend
-  socket.on('send_message', data => {});
-});
-
 // Emmiting random number every 5 second
 
 const UniqueNums = new Set();
@@ -37,13 +29,24 @@ while (UniqueNums.size < 75) {
 const randomArr = Array.from(UniqueNums);
 let index = 0;
 
-setInterval(() => {
+const emmitNumbers = setInterval(() => {
   io.emit('receive_message', {
     num: randomArr[index],
     allDrawnNumbers: randomArr.slice(0, index + 1),
   });
   index++;
-}, 5000);
+}, 2000);
+
+// Connecting frontend and backend
+io.on('connection', socket => {
+  console.log(`User connected: ${socket.id}`);
+
+  // Listening on the event from frontend
+  socket.on('send_message', data => {
+    console.log(data);
+    clearInterval(emmitNumbers);
+  });
+});
 
 // Starting the server on port 3001
 server.listen(3001, () => {

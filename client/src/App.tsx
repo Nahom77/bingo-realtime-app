@@ -6,11 +6,10 @@ function App() {
   // const [message, setMessage] = useState('');
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
+
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
-  // const onSendMessage = () => {
-  //   socket.emit('send_message', { message });
-  // };
+  //
   // Memoize so it only runs once
   const randomArr = useMemo(() => {
     const uniqueNums = new Set<number>();
@@ -21,6 +20,7 @@ function App() {
     return Array.from(uniqueNums);
   }, []); // empty deps => only once
 
+  // Receiving the numbers from backend
   useEffect(() => {
     socket.on('receive_message', data => {
       console.log(data);
@@ -43,30 +43,29 @@ function App() {
       }
   }, [drawnNums, randomArr, matchedNums]);
 
-  // const UniqueNums = new Set<number>();
-  // while (UniqueNums.size < 25) {
-  //   const num = Math.floor(Math.random() * 75) + 1;
-  //   UniqueNums.add(num);
-  // }
+  if (matchedNums.length >= 5) {
+    socket.emit('send_message', 'we got winner');
+    socket.off('receive_message');
+  }
 
-  // setRandomArr(Array.from(UniqueNums));
-
-  // console.log(randomArr);
+  if (matchedNums.length >= 5) return <h1>You win</h1>;
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
-        gap: '10px',
-        width: 'fit-content',
-        margin: 'auto',
-      }}
-    >
-      {randomArr?.map((num, index) => (
-        <Card key={index} number={num} drawnNums={drawnNums} />
-      ))}
-    </div>
+    <>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '10px',
+          width: 'fit-content',
+          margin: 'auto',
+        }}
+      >
+        {randomArr?.map((num, index) => (
+          <Card key={index} number={num} drawnNums={drawnNums} />
+        ))}
+      </div>
+    </>
   );
 }
 
