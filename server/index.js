@@ -35,7 +35,7 @@ const emmitNumbers = setInterval(() => {
     allDrawnNumbers: randomArr.slice(0, index + 1),
   });
   index++;
-}, 2000);
+}, 5000);
 
 // Connecting frontend and backend
 io.on('connection', socket => {

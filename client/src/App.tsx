@@ -3,12 +3,20 @@ import socket from './socket';
 import Card from './Card';
 
 function App() {
+  // const SOCKET_URL = 'http://localhost:3001';
+
   // const [message, setMessage] = useState('');
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
   const [userName, setUserName] = useState('');
 
   const nameRef = useRef<HTMLInputElement>(null);
+
+  // const SOCKET_URL = useMemo(() => {
+  //   if (userName) return 'http://localhost:3001';
+  //   else return '';
+  // }, []);
+
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
   //
@@ -24,16 +32,19 @@ function App() {
 
   // Receiving the numbers from backend
   useEffect(() => {
-    socket.on('receive_message', data => {
-      console.log(data);
-      setDrawnNums(data.allDrawnNumbers);
-    });
+    if (userName) {
+      socket.connect();
 
+      socket.on('receive_message', data => {
+        console.log(data);
+        setDrawnNums(data.allDrawnNumbers);
+      });
+    }
     // Cleanup on unmount
     return () => {
       socket.off('receive_message');
     };
-  }, []);
+  }, [userName]);
 
   // Winning condition
   useEffect(() => {
@@ -46,8 +57,12 @@ function App() {
   }, [drawnNums, randomArr, matchedNums]);
 
   if (matchedNums.length >= 5) {
-    socket.emit('send_message', 'we got winner');
+    socket.emit('send_message', { message: `${userName} Wins the game` });
     socket.off('receive_message');
+  }
+
+  if (userName) {
+    socket.emit('user_enterd', { userName });
   }
 
   if (matchedNums.length >= 5) return <h1>You win</h1>;
