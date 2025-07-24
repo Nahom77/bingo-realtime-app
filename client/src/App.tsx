@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import socket from './socket';
 import Card from './Card';
+import api from './lib/axios';
+import type { AxiosError } from 'axios';
 
 function App() {
   // const SOCKET_URL = 'http://localhost:3001';
@@ -21,6 +23,21 @@ function App() {
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
   //
+  // Handling restarting
+  async function handleRestart() {
+    try {
+      await api.post('/restart');
+      setDrawnNums(null);
+      setMatchedNums([]);
+      setWinnerUser('');
+    } catch (error) {
+      console.log(
+        'Error restarting the game - ',
+        (error as AxiosError).message
+      );
+    }
+  }
+
   // Memoize so it only runs once
   const randomArr = useMemo(() => {
     const uniqueNums = new Set<number>();
@@ -66,16 +83,27 @@ function App() {
 
   if (matchedNums.length >= 5) {
     socket.emit('send_message', { message: userName });
-    socket.off('receive_message');
   }
 
   if (userName) {
     socket.emit('user_enterd', { userName });
   }
 
-  if (winnerUser) return <h1>You lose , {winnerUser} wins the game.</h1>;
+  if (winnerUser)
+    return (
+      <>
+        {' '}
+        <h1>You lose , {winnerUser} wins the game.</h1>{' '}
+        <button onClick={handleRestart}>Restart</button>
+      </>
+    );
 
-  if (matchedNums.length >= 5) return <h1>You win</h1>;
+  if (matchedNums.length >= 5)
+    return (
+      <>
+        <h1>You win</h1> <button onClick={handleRestart}>Restart</button>
+      </>
+    );
 
   return (
     <>
