@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import socket from './socket';
 import Card from './Card';
 
@@ -6,7 +6,9 @@ function App() {
   // const [message, setMessage] = useState('');
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
+  const [userName, setUserName] = useState('');
 
+  const nameRef = useRef<HTMLInputElement>(null);
   // const [randomArr, setRandomArr] = useState<number[] | null>(null);
 
   //
@@ -52,19 +54,31 @@ function App() {
 
   return (
     <>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: '10px',
-          width: 'fit-content',
-          margin: 'auto',
-        }}
-      >
-        {randomArr?.map((num, index) => (
-          <Card key={index} number={num} drawnNums={drawnNums} />
-        ))}
-      </div>
+      {userName ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: '10px',
+            width: 'fit-content',
+            margin: 'auto',
+          }}
+        >
+          {randomArr?.map((num, index) => (
+            <Card key={index} number={num} drawnNums={drawnNums} />
+          ))}
+        </div>
+      ) : (
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            if (nameRef.current !== null) setUserName(nameRef.current.value);
+          }}
+        >
+          <input placeholder='username' required ref={nameRef} />
+          <button type='submit'>Start the Game</button>
+        </form>
+      )}
     </>
   );
 }
