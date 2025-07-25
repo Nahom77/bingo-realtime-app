@@ -59,7 +59,7 @@ function startEmmiting(randomArr) {
     });
     console.log(index, randomArr[index]);
     index = (index + 1) % 75;
-  }, 1000);
+  }, 5000);
 }
 
 // Stop Emmiting
