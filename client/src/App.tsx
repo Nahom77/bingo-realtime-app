@@ -5,31 +5,23 @@ import api from './lib/axios';
 import type { AxiosError } from 'axios';
 
 function App() {
-  // const SOCKET_URL = 'http://localhost:3001';
-
-  // const [message, setMessage] = useState('');
   const [drawnNums, setDrawnNums] = useState<number[] | null>(null);
   const [matchedNums, setMatchedNums] = useState<number[]>([]);
   const [userName, setUserName] = useState('');
   const [winnerUser, setWinnerUser] = useState('');
+  const [amIwinner, setAmIWinner] = useState(false);
 
   const nameRef = useRef<HTMLInputElement>(null);
 
-  // const SOCKET_URL = useMemo(() => {
-  //   if (userName) return 'http://localhost:3001';
-  //   else return '';
-  // }, []);
-
-  // const [randomArr, setRandomArr] = useState<number[] | null>(null);
-
-  //
   // Handling restarting
   async function handleRestart() {
     try {
       await api.post('/restart');
+
       setDrawnNums(null);
       setMatchedNums([]);
       setWinnerUser('');
+      setAmIWinner(false);
     } catch (error) {
       console.log(
         'Error restarting the game - ',
@@ -81,28 +73,33 @@ function App() {
       }
   }, [drawnNums, randomArr, matchedNums]);
 
-  if (matchedNums.length >= 5) {
-    socket.emit('send_message', { message: userName });
-  }
-
-  if (userName) {
-    socket.emit('user_enterd', { userName });
-  }
+  useEffect(() => {
+    if (matchedNums.length >= 5) {
+      socket.emit('send_message', { message: userName });
+      setAmIWinner(true);
+      setDrawnNums([]);
+    }
+  }, [matchedNums.length, userName]);
 
   if (winnerUser)
     return (
-      <>
+      <div className='container'>
         {' '}
         <h1>You lose , {winnerUser} wins the game.</h1>{' '}
-        <button onClick={handleRestart}>Restart</button>
-      </>
+        <button className='btn' onClick={handleRestart}>
+          Restart
+        </button>
+      </div>
     );
 
-  if (matchedNums.length >= 5)
+  if (amIwinner)
     return (
-      <>
-        <h1>You win</h1> <button onClick={handleRestart}>Restart</button>
-      </>
+      <div className='container'>
+        <h1>You win</h1>{' '}
+        <button className='btn' onClick={handleRestart}>
+          Restart
+        </button>
+      </div>
     );
 
   return (
@@ -112,36 +109,58 @@ function App() {
           <div className='title'>
             <h1>Bingo Game</h1>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
-
-              gap: '10px',
-              width: 'fit-content',
-              margin: 'auto',
-              backgroundColor: 'rgba(24, 23, 22, 0.2)',
-              boxShadow: ' 0 1rem 2rem rgba(0, 0, 0, 0.61)',
-              mixBlendMode: 'overlay',
-              border: '1px solid white',
-              padding: 'clamp(1rem, 1rem + 1vw, 2.5rem)',
-              borderRadius: '2rem',
-            }}
-          >
-            {randomArr?.map((num, index) => (
-              <Card key={index} number={num} drawnNums={drawnNums} />
-            ))}
+          <h3 className='user-name'>Welcome {userName}</h3>
+          <div className='container'>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: '10px',
+                width: 'fit-content',
+                margin: 'auto',
+                backgroundColor: 'rgba(24, 23, 22, 0.2)',
+                boxShadow: ' 0 1rem 2rem rgba(0, 0, 0, 0.61)',
+                mixBlendMode: 'overlay',
+                border: '1px solid white',
+                padding: 'clamp(1rem, 1rem + 1vw, 2.5rem)',
+                borderRadius: '2rem',
+              }}
+            >
+              {randomArr?.map((num, index) => (
+                <Card key={index} number={num} drawnNums={drawnNums} />
+              ))}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                gap: '5px',
+                flexWrap: 'wrap',
+                width: '90vw',
+              }}
+            >
+              {drawnNums?.map((num, index) => (
+                <Card key={index} number={num} drawnNums={drawnNums} />
+              ))}
+            </div>
           </div>
         </>
       ) : (
         <form
+          className='container'
           onSubmit={e => {
             e.preventDefault();
             if (nameRef.current !== null) setUserName(nameRef.current.value);
           }}
         >
-          <input placeholder='username' required ref={nameRef} />
-          <button type='submit'>Start the Game</button>
+          <input
+            className='username-input'
+            placeholder='username'
+            required
+            ref={nameRef}
+          />
+          <button className='btn' type='submit'>
+            Start the Game
+          </button>
         </form>
       )}
     </>

@@ -18,7 +18,6 @@ const restartGame = router.post('/', async (req, res) => {
   res.status(201).send('Restarted');
 });
 
-
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -56,7 +55,7 @@ function startEmmiting(randomArr) {
     });
     console.log(randomArr[index]);
     index++;
-  }, 5000);
+  }, 2000);
 }
 
 // Stop Emmiting
@@ -67,17 +66,27 @@ function stopEmitting() {
 
 // Connecting frontend and backend
 let alreadyEmmiting;
+let socketIds = [];
+const users = new Map();
+
 io.on('connection', socket => {
   console.log(`User connected: ${socket.id}`);
 
   //Start emmiting when the user enters or the connection started
   if (!alreadyEmmiting) startEmmiting(randomArr);
 
-  if (socket.id) alreadyEmmiting = true;
+  // Identifing users with custom id
+  socket.on('register', userId => {
+    users.set(socket.id, { userId });
+    console.log(`Registered user ${userId} with socket ${socket.id}`);
+  });
+  alreadyEmmiting = true;
+
   // Listening on the event from frontend
   socket.on('send_message', data => {
     console.log(data);
     stopEmitting();
+    alreadyEmmiting = false;
     socket.broadcast.emit('game_ended', data);
   });
 });

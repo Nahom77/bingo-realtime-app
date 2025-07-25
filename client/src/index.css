@@ -42,3 +42,39 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.user-name {
+  text-align: center;
+  margin-bottom: 4.5rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+
+  margin-top: 5rem;
+}
+
+.container h1 {
+  font-size: clamp(0.5rem, 1rem + 1vw, 2rem);
+}
+
+.username-input {
+  padding: 1rem;
+  font-size: clamp(1rem, 1rem + 1vw, 1.5rem);
+  border: none;
+  border-radius: 1rem;
+}
+
+.btn {
+  width: 100%;
+  padding: 1.5rem;
+  font-size: clamp(1rem, 1rem + 1vw, 1.5rem);
+  border: none;
+  border-radius: 1rem;
+
+  mix-blend-mode: overlay;
+}
