@@ -5,6 +5,8 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { start } = require('repl');
 
+const users = new Map();
+
 // Router
 const router = express.Router();
 
@@ -54,9 +56,9 @@ function startEmmiting(randomArr) {
       num: randomArr[index],
       allDrawnNumbers: randomArr.slice(0, index + 1),
     });
-    console.log(randomArr[index]);
-    index++;
-  }, 2000);
+    console.log(index, randomArr[index]);
+    index = (index + 1) % 75;
+  }, 1000);
 }
 
 // Stop Emmiting
@@ -68,22 +70,19 @@ function stopEmitting() {
 // Connecting frontend and backend
 // let alreadyEmmiting;
 let socketIds = [];
-const users = new Map();
 
 io.on('connection', socket => {
   console.log(`User connected: ${socket.id}`);
 
+  // Registering a user to a map
+  users.set(socket.id, socket.id);
+  // console.log(`Registered user ${userId} with socket ${socket.id}`);
+
   //Start emmiting when the user enters or the connection started
-  if (!alreadyEmmiting) startEmmiting(randomArr);
+  if (!alreadyEmmiting && users.size > 0) startEmmiting(randomArr);
+  console.log(users.size);
 
-  // Identifing users with custom id
-  socket.on('register', userId => {
-    users.set(socket.id, { userId });
-    console.log(`Registered user ${userId} with socket ${socket.id}`);
-  });
   alreadyEmmiting = true;
-
-  if (!socket.id) stopEmitting();
 
   // Listening on the event from frontend
   socket.on('send_message', data => {
@@ -92,6 +91,16 @@ io.on('connection', socket => {
     alreadyEmmiting = false;
     // alreadyRestarted = false;
     socket.broadcast.emit('game_ended', data);
+  });
+
+  // Stopping the interval when disconnected
+  socket.on('disconnect', () => {
+    users.delete(socket.id); // To delete a user when he disconnects
+
+    if (users.size === 0) stopEmitting();
+    alreadyEmmiting = false; // Clean up interval on disconnect
+    console.log(`User disconnected: ${socket.id}`);
+    console.log(users);
   });
 });
 
