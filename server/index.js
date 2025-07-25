@@ -8,11 +8,12 @@ const { start } = require('repl');
 // Router
 const router = express.Router();
 
-let alreadyRestarted;
+// let alreadyRestarted;
+let alreadyEmmiting;
 const restartGame = router.post('/', async (req, res) => {
-  if (!alreadyRestarted) startEmmiting(randomArr);
+  if (!alreadyEmmiting) startEmmiting(randomArr);
 
-  alreadyRestarted = true;
+  alreadyEmmiting = true;
 
   console.log('Game Restarted');
   res.status(201).send('Restarted');
@@ -65,7 +66,7 @@ function stopEmitting() {
 }
 
 // Connecting frontend and backend
-let alreadyEmmiting;
+// let alreadyEmmiting;
 let socketIds = [];
 const users = new Map();
 
@@ -82,11 +83,14 @@ io.on('connection', socket => {
   });
   alreadyEmmiting = true;
 
+  if (!socket.id) stopEmitting();
+
   // Listening on the event from frontend
   socket.on('send_message', data => {
     console.log(data);
     stopEmitting();
     alreadyEmmiting = false;
+    // alreadyRestarted = false;
     socket.broadcast.emit('game_ended', data);
   });
 });

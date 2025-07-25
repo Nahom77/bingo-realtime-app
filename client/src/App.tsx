@@ -56,6 +56,8 @@ function App() {
     };
   }, [userName]);
 
+  // If there is no user to disconnet / stop the setTimeinterval
+
   // Getting A winner Name
   useEffect(() => {
     socket.on('game_ended', data => {
